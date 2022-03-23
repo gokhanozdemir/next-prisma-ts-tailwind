@@ -5,6 +5,7 @@ import Router, { useRouter } from 'next/router'
 import { prisma } from '../lib/prisma'
 import { route } from 'next/dist/server/router'
 
+// Declare custom data types to use in functions
 interface Notes {
   notes: {
     title: string,
@@ -36,7 +37,7 @@ const Home = ({ notes }: Notes) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        method: "POST"
+        method: 'POST'
       })
         .then(() => {
           console.log("fetchEnd")
@@ -44,6 +45,23 @@ const Home = ({ notes }: Notes) => {
           refreshData()
         })
 
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async function deleteNote(id: string) {
+    try {
+      console.log(`Delete Started id:${id}`)
+      fetch(`http://localhost:3000/api/note/${id}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'DELETE'
+      }).then(() => {
+        console.log('DELETE Completed')
+        refreshData()
+      })
     } catch (error) {
       console.log(error)
     }
@@ -83,7 +101,8 @@ const Home = ({ notes }: Notes) => {
 
         <button type='submit' className='bg-blue-500 text-white rounded p-1'>Add + </button>
       </form>
-      <div className='w-auto min-w-[25%] mt-20 mx-auto space-y-6 flex flex-col items-stretch'>
+      <div
+        className='w-auto min-w-[25%] max-w-min mx-auto space-y-6 flex flex-col mt-4 items-stretch'>
         <ul>
           {notes.map(note => (
             <li key={note.id} className='border-b border-gray-600 p-2' >
@@ -92,6 +111,7 @@ const Home = ({ notes }: Notes) => {
                   <h3 className='font-bold'>{note.title}</h3>
                   <p className='text-sm'>{note.content}</p>
                 </div>
+                <button onClick={() => deleteNote(note.id)} className="text-white rounded-md bg-red-500 px-3">X</button>
               </div>
             </li>
           ))}
