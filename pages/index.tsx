@@ -29,6 +29,8 @@ const Home = ({ notes }: Notes) => {
     router.replace(router.asPath)
   }
 
+
+
   async function create(data: FormData) {
     try {
       console.log("fetchStart")
@@ -39,7 +41,13 @@ const Home = ({ notes }: Notes) => {
         },
         method: 'POST'
       })
+        // if there is data existst with the form that is already being edited
+        // then delete the former and add a new one
+
         .then(() => {
+          if (data.id) {
+            deleteNote(data.id)
+          }
           console.log("fetchEnd")
           setForm({ title: '', content: '', id: '' })
           refreshData()
@@ -77,7 +85,7 @@ const Home = ({ notes }: Notes) => {
 
   return (
     <div>
-      <h1 className="text-center font-bold text-2xl mt-4">Notes</h1>
+      <h1 className="text-center font-bold text-2xl m-4 text-amber-600">Notes</h1>
       <form onSubmit={e => {
         e.preventDefault()
         handleSubmit(form)
@@ -99,10 +107,10 @@ const Home = ({ notes }: Notes) => {
           className="border-2 rounded border-gray-200 p-1"
         />
 
-        <button type='submit' className='bg-blue-500 text-white rounded p-1'>Add + </button>
+        <button type='submit' className='bg-amber-600 text-white rounded p-1'>Add</button>
       </form>
       <div
-        className='w-auto min-w-[25%] max-w-min mx-auto space-y-6 flex flex-col mt-4 items-stretch'>
+        className='min-w-[25%] mx-20 flex flex-col mt-4 items-stretch'>
         <ul>
           {notes.map(note => (
             <li key={note.id} className='border-b border-gray-600 p-2' >
@@ -111,7 +119,11 @@ const Home = ({ notes }: Notes) => {
                   <h3 className='font-bold'>{note.title}</h3>
                   <p className='text-sm'>{note.content}</p>
                 </div>
-                <button onClick={() => deleteNote(note.id)} className="text-white rounded-md bg-red-500 px-3">X</button>
+                {/* Actually we are not putting but adding a new one and deleting the old */}
+                <div className='pt-3  '>
+                  <button onClick={() => setForm({ title: note.title, content: note.content, id: note.id })} className="mr-2 m-auto text-white rounded-md bg-amber-600 px-3">Edit</button>
+                  <button onClick={() => deleteNote(note.id)} className="inline-block text-white rounded-md bg-red-500 px-3">X</button>
+                </div>
               </div>
             </li>
           ))}
